@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folha de Ponto PRO | Carteira de Trabalho Digital</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', 'Poppins', 'Roboto', system-ui, sans-serif;
+        background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 50%, #1e1b3a 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Animação de fundo sutil */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(0, 255, 200, 0.03) 0%, transparent 60%);
+        pointer-events: none;
+        animation: pulseGlow 8s ease-in-out infinite;
+        z-index: 0;
+    }
+
+    @keyframes pulseGlow {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 0.8; }
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+        background: rgba(15, 25, 45, 0.55);
+        backdrop-filter: blur(12px);
+        border-radius: 28px;
+        border: 1px solid rgba(0, 255, 200, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+        border-color: rgba(0, 255, 200, 0.5);
+        box-shadow: 0 12px 40px rgba(0, 255, 200, 0.15);
+    }
+
+    h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(120deg, #fff, #00ffcc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .clock-panel {
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    #clock {
+        font-size: 3rem;
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        color: #00ffcc;
+        text-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
+        letter-spacing: 3px;
+    }
+
+    #date {
+        font-size: 1.1rem;
+        color: #a0aec0;
+        margin-top: 8px;
+    }
+
+    .input-section {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    input, button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 40px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+
+    input {
+        background: rgba(30, 40, 60, 0.8);
+        border: 1px solid rgba(0, 255, 200, 0.3);
+        color: #fff;
+        min-width: 200px;
+    }
+
+    input:focus {
+        border-color: #00ffcc;
+        box-shadow: 0 0 0 2px rgba(0, 255, 200, 0.2);
+    }
+
+    .checkbox-group {
+        display: flex;
+        gap: 25px;
+        justify-content: center;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 8px 18px;
+        border-radius: 40px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .checkbox-group label:hover {
+        background: rgba(0, 255, 200, 0.2);
+    }
+
+    input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #00ffcc;
+        margin: 0;
+    }
+
+    .button-bar {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+
+    .btn {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(0, 255, 200, 0.4);
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #00ccaa, #0088aa);
+        border: none;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 255, 200, 0.3);
+    }
+
+    .btn:hover {
+        transform: scale(0.98);
+        background: rgba(0, 255, 200, 0.2);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin: 25px 0;
+    }
+
+    .stat-card {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        border-radius: 20px;
+        padding: 15px;
+        text-align: center;
+        border-left: 3px solid #00ffcc;
+    }
+
+    .stat-card .label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.7;
+    }
+
+    .stat-card .value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        font-family: monospace;
+        color: #7fffd9;
+        margin-top: 8px;
+    }
+
+    .money-highlight {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffd966, #ffb347);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    /* Tabela Histórico */
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 20px;
+        margin: 20px 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(10, 20, 30, 0.6);
+        backdrop-filter: blur(4px);
+        border-radius: 20px;
+    }
+
+    th, td {
+        padding: 12px 10px;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 255, 200, 0.2);
+    }
+
+    th {
+        background: rgba(0, 40, 50, 0.7);
+        color: #00ffcc;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background: rgba(0, 255, 200, 0.1);
+    }
+
+    .badge {
+        background: rgba(0, 255, 200, 0.2);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    hr {
+        margin: 20px 0;
+        border: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #00ffcc, transparent);
+    }
+
+    @media (max-width: 768px) {
+        .stat-card .value { font-size: 1.3rem; }
+        #clock { font-size: 2rem; }
+        h2 { font-size: 1.5rem; }
+    }
+
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        padding: 12px 24px;
+        border-radius: 40px;
+        border-left: 4px solid #00ffcc;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="glass-card" style="padding: 25px;">
+        <h2>📋 FOLHA DE PONTO PRO</h2>
+        <h2 style="font-size: 1rem; margin-top: -10px;">CARTEIRA DE TRABALHO DIGITAL</h2>
+        
+        <div class="clock-panel">
+            <div id="clock">--:--:--</div>
+            <div id="date"></div>
+        </div>
+
+        <!-- Dados do Funcionário + Registro CLT -->
+        <div class="input-section">
+            <input type="text" id="nomeFuncionario" placeholder="👤 Nome do Funcionário">
+            <input type="number" id="salario" placeholder="💰 Salário Mensal (R$)" step="0.01">
+        </div>
+
+        <!-- 🔥 NOVO: SELETOR DE DATA MANUAL PARA CARTEIRA -->
+        <div class="glass-card" style="padding: 15px; margin: 15px 0; background: rgba(0,0,0,0.3);">
+            <div style="font-size: 0.9rem; margin-bottom: 10px; color: #00ffcc;">📅 REGISTRO NA CARTEIRA DE TRABALHO</div>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <input type="number" id="diaTrabalho" placeholder="Dia" min="1" max="31" style="width: 80px;">
+                <input type="number" id="mesTrabalho" placeholder="Mês" min="1" max="12" style="width: 80px;">
+                <input type="number" id="anoTrabalho" placeholder="Ano" min="2020" max="2030" style="width: 100px;">
+                <button class="btn btn-primary" onclick="usarDataAtual()" style="padding: 12px 20px;">📅 Usar Hoje</button>
+            </div>
+            <div style="font-size: 0.75rem; margin-top: 8px; opacity: 0.6;">* Data que será registrada na carteira (dia trabalhado)</div>
+        </div>
+
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="dia50"> 🌙 Dia 50% (Extra 50%)</label>
+            <label><input type="checkbox" id="feriado"> 🎉 Dia 100% (Extra Dobro)</label>
+        </div>
+
+        <div class="button-bar">
+            <button class="btn btn-primary" onclick="registrar('entrada')">🟢 ENTRADA</button>
+            <button class="btn" onclick="registrar('almoco')">🍽️ ALMOÇO</button>
+            <button class="btn" onclick="registrar('retorno')">🔄 RETORNO</button>
+            <button class="btn btn-primary" onclick="registrar('saida')">🔴 SAÍDA</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="label">⏱️ Total Trabalhado</div><div class="value" id="total">00:00</div></div>
+            <div class="stat-card"><div class="label">📊 Horas Normais</div><div class="value" id="normal">00:00</div></div>
+            <div class="stat-card"><div class="label">⚡ Extra 50%</div><div class="value" id="extra50">00:00</div></div>
+            <div class="stat-card"><div class="label">⭐ Extra 100%</div><div class="value" id="extra100">00:00</div></div>
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <div style="font-size: 1rem; opacity: 0.8;">💵 VALOR BRUTO DO DIA</div>
+            <div class="money-highlight" id="totalDinheiro">R$ 0,00</div>
+        </div>
+
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="salvarDia()">💾 SALVAR NA CARTEIRA</button>
+            <button class="btn" onclick="gerarPDF()">📄 EXPORTAR PDF</button>
+            <button class="btn" onclick="limparRegistros()">🔄 Novo Dia</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <h3 style="margin: 20px 0 15px;">📜 HISTÓRICO DA CARTEIRA DE TRABALHO</h3>
+    <div class="table-wrapper">
+        <table id="tabela">
+            <thead>
+                <tr>
+                    <th>👤 Funcionário</th>
+                    <th>📅 Data Registrada (Carteira)</th>
+                    <th>⏰ Horas Trabalhadas</th>
+                    <th>💰 Valor (R$)</th>
+                    <th>📝 Tipo</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaCorpo">
+                <tr><td colspan="5" style="text-align:center;">Nenhum registro na carteira ainda</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+// ======================== RELÓGIO ========================
+setInterval(() => {
+    let d = new Date();
+    document.getElementById("clock").innerText = d.toLocaleTimeString('pt-BR');
+    document.getElementById("date").innerText = d.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}, 1000);
+
+// ======================== VARIÁVEIS GLOBAIS ========================
+let registros = {};
+const JORNADA_PADRAO_MS = 8 * 3600000;
+
+const totalEl = document.getElementById("total");
+const normalEl = document.getElementById("normal");
+const extra50El = document.getElementById("extra50");
+const extra100El = document.getElementById("extra100");
+const totalDinheiroSpan = document.getElementById("totalDinheiro");
+
+const dia50Check = document.getElementById("dia50");
+const feriadoCheck = document.getElementById("feriado");
+const salarioInput = document.getElementById("salario");
+const nomeInput = document.getElementById("nomeFuncionario");
+
+// Campos de data manual para carteira
+const diaInput = document.getElementById("diaTrabalho");
+const mesInput = document.getElementById("mesTrabalho");
+const anoInput = document.getElementById("anoTrabalho");
+
+// Preencher data atual nos campos
+function usarDataAtual() {
+    const hoje = new Date();
+    diaInput.value = hoje.getDate();
+    mesInput.value = hoje.getMonth() + 1;
+    anoInput.value = hoje.getFullYear();
+    mostrarNotificacao("📅 Data atualizada para hoje!", "#00ffcc");
+}
+
+// Inicializar campos com data atual
+function inicializarDataAtual() {
+    const hoje = new Date();
+    if (!diaInput.value) diaInput.value = hoje.getDate();
+    if (!mesInput.value) mesInput.value = hoje.getMonth() + 1;
+    if (!anoInput.value) anoInput.value = hoje.getFullYear();
+}
+
+// ======================== FUNÇÕES DE REGISTRO ========================
+function registrar(tipo) {
+    const agora = new Date();
+    
+    if (tipo === 'entrada') {
+        registros = {};
+        registros.entrada = agora;
+        delete registros.almoco;
+        delete registros.retorno;
+        delete registros.saida;
+        mostrarNotificacao("✅ Entrada registrada", "#00ffcc");
+    } 
+    else if (tipo === 'almoco') {
+        if (!registros.entrada) { alert("⚠️ Registre a entrada primeiro!"); return; }
+        if (registros.saida) { alert("Jornada já finalizada!"); return; }
+        registros.almoco = agora;
+        mostrarNotificacao("🍽️ Início do almoço", "#ffaa66");
+    }
+    else if (tipo === 'retorno') {
+        if (!registros.almoco) { alert("⚠️ Registre o almoço antes do retorno!"); return; }
+        if (registros.saida) { alert("Jornada finalizada!"); return; }
+        registros.retorno = agora;
+        mostrarNotificacao("🔄 Retorno do almoço", "#88ffaa");
+    }
+    else if (tipo === 'saida') {
+        if (!registros.entrada) { alert("Registre a entrada primeiro."); return; }
+        if (registros.saida) { alert("Saída já registrada."); return; }
+        if (registros.almoco && !registros.retorno) {
+            if (confirm("⚠️ Almoço iniciado sem retorno. Deseja marcar retorno agora?")) {
+                registros.retorno = new Date();
+            } else {
+                alert("Por favor, registre o retorno primeiro.");
+                return;
+            }
+        }
+        registros.saida = agora;
+        mostrarNotificacao("🏁 Jornada finalizada! Cálculo concluído.", "#66ccff");
+    }
+    
+    calcular();
+}
+
+// ======================== CÁLCULO DE HORAS ========================
+function formatarHM(ms) {
+    if (ms < 0) ms = 0;
+    let horas = Math.floor(ms / 3600000);
+    let minutos = Math.floor((ms % 3600000) / 60000);
+    return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+}
+
+function calcularHorasTrabalhadas() {
+    if (!registros.entrada || !registros.saida) return 0;
+    let total = registros.saida - registros.entrada;
+    if (registros.almoco && registros.retorno && registros.retorno > registros.almoco) {
+        total -= (registros.retorno - registros.almoco);
+    }
+    return Math.max(0, total);
+}
+
+function calcular() {
+    let totalTrabalhado = calcularHorasTrabalhadas();
+    if (totalTrabalhado === 0 && !registros.entrada) {
+        totalEl.innerText = "00:00";
+        normalEl.innerText = "00:00";
+        extra50El.innerText = "00:00";
+        extra100El.innerText = "00:00";
+        return;
+    }
+    
+    totalEl.innerText = formatarHM(totalTrabalhado);
+    
+    let normalMs = 0, extra50Ms = 0, extra100Ms = 0;
+    const isDia50 = dia50Check.checked;
+    const isFeriado = feriadoCheck.checked;
+    
+    if (isDia50) {
+        extra50Ms = totalTrabalhado;
+    } 
+    else if (isFeriado) {
+        extra100Ms = totalTrabalhado;
+    }
+    else {
+        if (totalTrabalhado <= JORNADA_PADRAO_MS) {
+            normalMs = totalTrabalhado;
+        } else {
+            normalMs = JORNADA_PADRAO_MS;
+            extra50Ms = totalTrabalhado - JORNADA_PADRAO_MS;
+        }
+    }
+    
+    normalEl.innerText = formatarHM(normalMs);
+    extra50El.innerText = formatarHM(extra50Ms);
+    extra100El.innerText = formatarHM(extra100Ms);
+    
+    calcularFinanceiro(normalMs, extra50Ms, extra100Ms);
+}
+
+function calcularFinanceiro(normalMs, extra50Ms, extra100Ms) {
+    let salarioMensal = parseFloat(salarioInput.value);
+    if (isNaN(salarioMensal)) salarioMensal = 0;
+    const valorHora = salarioMensal / 220;
+    
+    let valorNormal = (normalMs / 3600000) * valorHora;
+    let valorExtra50 = (extra50Ms / 3600000) * valorHora * 1.5;
+    let valorExtra100 = (extra100Ms / 3600000) * valorHora * 2;
+    
+    let totalBruto = valorNormal + valorExtra50 + valorExtra100;
+    
+    totalDinheiroSpan.innerText = totalBruto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return totalBruto;
+}
+
+// ======================== SALVAR NA CARTEIRA DE TRABALHO ========================
+function salvarDia() {
+    // Validar se tem nome
+    let nome = nomeInput.value.trim();
+    if (nome === "") {
+        alert("⚠️ Por favor, informe o nome do funcionário antes de salvar na carteira!");
+        return;
+    }
+    
+    // Validar se tem saída registrada
+    if (!registros.saida) {
+        alert("⚠️ Você precisa finalizar a jornada (registrar SAÍDA) antes de salvar na carteira!");
+        return;
+    }
+    
+    // Validar se tem horas trabalhadas
+    let totalHoras = totalEl.innerText;
+    if (totalHoras === "00:00") {
+        alert("⚠️ Nenhuma hora trabalhada registrada. Verifique os pontos.");
+        return;
+    }
+    
+    // Obter data da carteira (dia, mês, ano informados)
+    let dia = parseInt(diaInput.value);
+    let mes = parseInt(mesInput.value);
+    let ano = parseInt(anoInput.value);
+    
+    if (isNaN(dia) || isNaN(mes) || isNaN(ano)) {
+        alert("⚠️ Por favor, preencha corretamente o DIA, MÊS e ANO do registro na carteira!");
+        return;
+    }
+    
+    if (dia < 1 || dia > 31 || mes < 1 || mes > 12 || ano < 1920 || ano > 2100) {
+        alert("⚠️ Data inválida! Verifique dia (1-31), mês (1-12) e ano válido.");
+        return;
+    }
+    
+    // Validar data existente (exemplo: 31/02 não é válido)
+    let dataObj = new Date(ano, mes-1, dia);
+    if (dataObj.getDate() !== dia || dataObj.getMonth() !== mes-1) {
+        alert("⚠️ Data inválida! Exemplo: 31/02 não existe. Corrija.");
+        return;
+    }
+    
+    const dataFormatada = `${dia.toString().padStart(2,'0')}/${mes.toString().padStart(2,'0')}/${ano}`;
+    
+    let valorDia = parseFloat(totalDinheiroSpan.innerText.replace(/\./g, '').replace(',', '.'));
+    if (isNaN(valorDia)) valorDia = 0;
+    
+    // Determinar tipo de dia
+    let tipoDia = "Normal";
+    if (dia50Check.checked) tipoDia = "Extra 50%";
+    if (feriadoCheck.checked) tipoDia = "Extra 100% (Feriado)";
+    
+    // Carregar histórico
+    let historico = JSON.parse(localStorage.getItem("carteira_trabalho") || "[]");
+    
+    // Verificar se já existe registro para essa data e funcionário (evitar duplicidade no mesmo dia)
+    const jaExiste = historico.some(item => item.data === dataFormatada && item.nome === nome);
+    if (jaExiste) {
+        if (!confirm(`⚠️ Já existe um registro para ${nome} na data ${dataFormatada}. Deseja sobrescrever?`)) {
+            return;
+        }
+        // Remover o antigo
+        historico = historico.filter(item => !(item.data === dataFormatada && item.nome === nome));
+    }
+    
+    // Adicionar novo registro na carteira
+    historico.unshift({
+        nome: nome,
+        data: dataFormatada,
+        dataOriginal: new Date(ano, mes-1, dia).getTime(),
+        horas: totalHoras,
+        valor: valorDia.toFixed(2),
+        tipo: tipoDia,
+        timestamp: Date.now()
+    });
+    
+    // Ordenar por data (mais recente primeiro)
+    historico.sort((a,b) => b.dataOriginal - a.dataOriginal);
+    
+    localStorage.setItem("carteira_trabalho", JSON.stringify(historico));
+    
+    mostrarNotificacao(`✅ Registro salvo na Carteira! Data: ${dataFormatada}`, "#00ffcc");
+    
+    // Limpar registros do dia atual para começar novo dia
+    registros = {};
+    calcular();
+    
+    // Recarregar tabela
+    carregarTabela();
+}
+
+// ======================== CARREGAR TABELA (CARTEIRA) ========================
+function carregarTabela() {
+    let historico = JSON.parse(localStorage.getItem("carteira_trabalho") || "[]");
+    const tbody = document.getElementById("tabelaCorpo");
+    
+    if (!tbody) return;
+    
+    if (historico.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">📭 Nenhum registro na carteira ainda</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = "";
+    historico.forEach(item => {
+        const row = tbody.insertRow();
+        row.insertCell(0).innerHTML = `<strong>${escapeHtml(item.nome)}</strong>`;
+        row.insertCell(1).innerHTML = `<span class="badge">📅 ${item.data}</span>`;
+        row.insertCell(2).innerHTML = `⏱️ ${item.horas}`;
+        row.insertCell(3).innerHTML = `R$ ${parseFloat(item.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        row.insertCell(4).innerHTML = `<span style="color: #00ffcc;">${item.tipo}</span>`;
+    });
+}
+
+// Função de escape simples
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// ======================== GERAR PDF COM DADOS DA CARTEIRA ========================
+function gerarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const historico = JSON.parse(localStorage.getItem("carteira_trabalho") || "[]");
+    
+    // Fundo escuro elegante
+    doc.setFillColor(10, 20, 35);
+    doc.rect(0, 0, 297, 210, 'F');
+    doc.setTextColor(200, 255, 240);
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("📋 CARTEIRA DE TRABALHO DIGITAL", 20, 25);
+    doc.setFontSize(10);
+    doc.setTextColor(150, 220, 200);
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 35);
+    
+    if (historico.length === 0) {
+        doc.setTextColor(255, 100, 100);
+        doc.text("Nenhum registro encontrado na carteira.", 20, 60);
+    } else {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(0, 255, 200);
+        doc.text("Funcionário", 20, 55);
+        doc.text("Data (Carteira)", 70, 55);
+        doc.text("Horas", 130, 55);
+        doc.text("Valor (R$)", 170, 55);
+        doc.text("Tipo", 220, 55);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        
+        let y = 65;
+        let totalGeral = 0;
+        
+        historico.slice(0, 25).forEach(item => {
+            if (y > 190) {
+                doc.addPage();
+                y = 20;
+                doc.setFillColor(10, 20, 35);
+                doc.rect(0, 0, 297, 210, 'F');
+                doc.setTextColor(0, 255, 200);
+                doc.setFontSize(11);
+                doc.text("Funcionário", 20, 30);
+                doc.text("Data (Carteira)", 70, 30);
+                doc.text("Horas", 130, 30);
+                doc.text("Valor (R$)", 170, 30);
+                doc.text("Tipo", 220, 30);
+                doc.setTextColor(255, 255, 255);
+                y = 40;
+            }
+            doc.text(item.nome.substring(0, 25), 20, y);
+            doc.text(item.data, 70, y);
+            doc.text(item.horas, 130, y);
+            doc.text(`R$ ${parseFloat(item.valor).toFixed(2)}`, 170, y);
+            doc.text(item.tipo, 220, y);
+            totalGeral += parseFloat(item.valor);
+            y += 8;
+        });
+        
+        y += 6;
+        doc.setDrawColor(0, 200, 180);
+        doc.line(20, y-2, 270, y-2);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(255, 215, 100);
+        doc.text(`💰 TOTAL ACUMULADO NA CARTEIRA: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`, 20, y+6);
+    }
+    
+    doc.save(`carteira_trabalho_${new Date().toISOString().slice(0,19)}.pdf`);
+    mostrarNotificacao("📄 PDF exportado com sucesso!", "#ffaa66");
+}
+
+// ======================== LIMPAR REGISTROS DO DIA ========================
+function limparRegistros() {
+    registros = {};
+    calcular();
+    mostrarNotificacao("🔄 Registros do dia limpos. Novo início!", "#ffaa66");
+}
+
+// ======================== NOTIFICAÇÃO ========================
+function mostrarNotificacao(msg, cor) {
+    const notif = document.createElement("div");
+    notif.className = "notification";
+    notif.innerHTML = msg;
+    notif.style.borderLeftColor = cor;
+    document.body.appendChild(notif);
+    setTimeout(() => {
+        notif.style.opacity = "0";
+        setTimeout(() => notif.remove(), 300);
+    }, 2500);
+}
+
+// ======================== EVENTOS E INICIALIZAÇÃO ========================
+dia50Check.onchange = () => { if(dia50Check.checked) feriadoCheck.checked = false; calcular(); };
+feriadoCheck.onchange = () => { if(feriadoCheck.checked) dia50Check.checked = false; calcular(); };
+salarioInput.oninput = () => calcular();
+nomeInput.oninput = () => {};
+
+// Inicializar
+inicializarDataAtual();
+carregarTabela();
+
+// Atualizar cálculo se mudarem os checks depois
+setInterval(() => {
+    if (registros.entrada && !registros.saida) calcular();
+}, 5000);
+
+</script>
+
+</body>
+</html>
