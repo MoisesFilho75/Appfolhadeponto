@@ -1,751 +1,391 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Ponto Profissional | Controle de Jornada</title>
-
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-/* Header */
-.header {
-    background: rgba(255,255,255,0.95);
-    border-radius: 20px;
-    padding: 20px 30px;
-    margin-bottom: 25px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.logo h1 {
-    color: #333;
-    font-size: 24px;
-    font-weight: 600;
-}
-
-.logo p {
-    color: #666;
-    font-size: 12px;
-}
-
-.clock-panel {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    padding: 12px 24px;
-    border-radius: 50px;
-    color: white;
-    font-weight: bold;
-    font-size: 28px;
-    font-family: monospace;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-/* Main Grid */
-.main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    margin-bottom: 25px;
-}
-
-/* Cards */
-.card {
-    background: rgba(255,255,255,0.95);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.card h3 {
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 20px;
-    border-left: 4px solid #667eea;
-    padding-left: 12px;
-}
-
-/* Form Groups */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    color: #555;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    font-size: 14px;
-    transition: all 0.3s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-}
-
-.row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-/* Buttons */
-.btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 10px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102,126,234,0.4);
-}
-
-.btn-secondary {
-    background: #48bb78;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #38a169;
-}
-
-.btn-info {
-    background: #4299e1;
-    color: white;
-}
-
-.btn-info:hover {
-    background: #3182ce;
-}
-
-/* Result Card */
-.result-card {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 20px;
-    padding: 20px;
-    color: white;
-    margin-bottom: 20px;
-}
-
-.result-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.stat-item {
-    background: rgba(255,255,255,0.2);
-    padding: 12px;
-    border-radius: 12px;
-    text-align: center;
-}
-
-.stat-label {
-    font-size: 11px;
-    opacity: 0.9;
-    margin-bottom: 5px;
-}
-
-.stat-value {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.total-value {
-    font-size: 28px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 2px solid rgba(255,255,255,0.3);
-}
-
-/* History Table */
-.history-table {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.history-item {
-    background: #f7f7f7;
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s;
-}
-
-.history-item:hover {
-    background: #e0e7ff;
-    transform: translateX(5px);
-}
-
-.history-date {
-    font-weight: 600;
-    color: #333;
-}
-
-.history-hours {
-    color: #667eea;
-    font-weight: 600;
-}
-
-.history-value {
-    color: #48bb78;
-    font-weight: bold;
-}
-
-.delete-btn {
-    background: #fc8181;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.delete-btn:hover {
-    background: #f56565;
-}
-
-.empty-history {
-    text-align: center;
-    color: #999;
-    padding: 40px;
-}
-
-/* Full Width */
-.full-width {
-    grid-column: 1 / -1;
-}
-
-/* Alert */
-.alert {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: white;
-    padding: 15px 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    z-index: 1000;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .main-grid {
-        grid-template-columns: 1fr;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0B2B2F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Ponto PRO</title>
     
-    .header {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-    }
-    
-    .clock-panel {
-        font-size: 20px;
-    }
-}
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #00D68F;
+            --primary-dark: #00B87A;
+            --bg-dark: #0B2B2F;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --text-light: #E9FFF2;
+            --safe-top: env(safe-area-inset-top);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Remove brilho ao tocar no iOS */
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.4;
+            padding-top: var(--safe-top); /* Suporte para notch do iPhone */
+        }
+
+        /* Container estilo App */
+        .app-shell {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Estilo Dashboard */
+        .app-header {
+            text-align: center;
+            padding: 24px 0;
+        }
+
+        .clock-container {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 12px;
+        }
+
+        #liveClock {
+            font-family: 'Fira Code', monospace;
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(0, 214, 143, 0.4);
+        }
+
+        .date-badge {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        /* Cards Estilo Glassmorphism */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Inputs Otimizados para Dedos */
+        .input-row {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            height: 54px; /* Altura ideal para toque */
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: white;
+            padding: 0 16px;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Grid de Horários */
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Botões Estilo Mobile */
+        .btn {
+            height: 56px;
+            border-radius: 18px;
+            border: none;
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .btn-main {
+            background: var(--primary);
+            color: #042020;
+            box-shadow: 0 10px 20px rgba(0, 214, 143, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Resultado Animado */
+        #resultadoArea {
+            transition: all 0.4s ease;
+        }
+
+        .res-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+
+        .res-total {
+            background: rgba(0, 214, 143, 0.15);
+            margin: 15px -20px -20px -20px;
+            padding: 20px;
+            border-radius: 0 0 28px 28px;
+            text-align: center;
+            border-top: 1px solid var(--primary);
+        }
+
+        .res-total span {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .res-total strong {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        /* Toast de Notificação */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: black;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ocultar scrollbar */
+        ::-webkit-scrollbar { display: none; }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="app-shell">
+    <header class="app-header">
+        <div class="clock-container">
+            <div id="liveClock">00:00:00</div>
+            <div class="date-badge" id="currentDate">-- de -- de ----</div>
+        </div>
+    </header>
 
-<div class="header">
-    <div class="logo">
-        <h1>📋 Folha de Ponto PRO</h1>
-        <p>Sistema de Controle de Jornada e Remuneração</p>
+    <div class="glass-card">
+        <h3>👤 Configurações</h3>
+        <div class="input-row">
+            <label>Nome do Colaborador</label>
+            <input type="text" id="nome" placeholder="Seu nome">
+        </div>
+        <div class="time-grid">
+            <div class="input-row">
+                <label>Salário Base</label>
+                <input type="number" id="salario" placeholder="R$ 0,00" inputmode="decimal">
+            </div>
+            <div class="input-row">
+                <label>Início Contrato</label>
+                <input type="date" id="admissao">
+            </div>
+        </div>
     </div>
-    <div class="clock-panel" id="clock">--:--:--</div>
-</div>
 
-<div class="main-grid">
-    <!-- Registro de Ponto -->
-    <div class="card">
-        <h3>📅 Registro de Jornada</h3>
-        
-        <div class="form-group">
-            <label>📆 Data</label>
-            <input type="date" id="data" class="data-input">
-        </div>
-        
-        <div class="row">
-            <div class="form-group">
-                <label>⏰ Entrada</label>
-                <input type="time" id="entrada">
+    <div class="glass-card">
+        <h3>⏱️ Jornada Diária</h3>
+        <div class="time-grid">
+            <div class="input-row">
+                <label>Entrada</label>
+                <input type="time" id="entrada" value="08:00">
             </div>
-            <div class="form-group">
-                <label>🍽️ Almoço</label>
-                <input type="time" id="almoco">
+            <div class="input-row">
+                <label>Saída Almoço</label>
+                <input type="time" id="almocoSaida" value="12:00">
             </div>
-        </div>
-        
-        <div class="row">
-            <div class="form-group">
-                <label>🔄 Retorno</label>
-                <input type="time" id="retorno">
+            <div class="input-row">
+                <label>Volta Almoço</label>
+                <input type="time" id="almocoRetorno" value="13:00">
             </div>
-            <div class="form-group">
-                <label>🏠 Saída</label>
-                <input type="time" id="saida">
+            <div class="input-row">
+                <label>Saída Final</label>
+                <input type="time" id="saidaFinal" value="17:00">
             </div>
         </div>
-        
-        <hr style="margin: 20px 0; border-color: #e0e0e0;">
-        
-        <h3>💰 Configuração Financeira</h3>
-        
-        <div class="form-group">
-            <label>💵 Salário Base (R$)</label>
-            <input type="number" id="salario" placeholder="Ex: 3000" step="100">
-        </div>
-        
-        <div class="row">
-            <div class="form-group">
-                <label>🏦 Adiantamento (R$)</label>
-                <input type="number" id="adiantamento" placeholder="0" step="100">
-            </div>
-            <div class="form-group">
-                <label>📊 INSS (%)</label>
-                <input type="number" id="inss" placeholder="11" step="0.5">
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="form-group">
-                <label>⚠️ Periculosidade (%)</label>
-                <input type="number" id="periculosidade" placeholder="30" step="5">
-            </div>
-            <div class="form-group">
-                <label>☣️ Insalubridade (%)</label>
-                <input type="number" id="insalubridade" placeholder="10" step="5">
-            </div>
-        </div>
-        
-        <button class="btn btn-primary" onclick="calcular()">📊 Calcular Rendimento</button>
-        <button class="btn btn-secondary" onclick="salvar()">💾 Salvar Registro</button>
+        <button class="btn btn-main" onclick="calcular()">📊 CALCULAR FOLHA</button>
     </div>
-    
-    <!-- Resultado do Cálculo -->
-    <div class="card">
-        <h3>📈 Resultado da Jornada</h3>
-        <div id="resultado" class="result-card">
-            <div style="text-align: center; opacity: 0.8;">
-                Preencha os dados e clique em "Calcular"
-            </div>
-        </div>
-        
-        <h3>📜 Contrato de Trabalho - Termos</h3>
-        <div style="font-size: 12px; color: #666; margin-top: 10px;">
-            <p>✓ Jornada padrão: 8 horas diárias / 44 semanais</p>
-            <p>✓ Horas extras: 50% (primeiras 2h) e 100% (excedentes)</p>
-            <p>✓ DSR (Descanso Semanal Remunerado): incluso no cálculo</p>
-            <p>✓ Base de cálculo: 220h mensais</p>
+
+    <div id="resultadoArea"></div>
+
+    <div style="margin-top: auto;">
+        <div class="time-grid">
+            <button class="btn btn-secondary" onclick="salvarLocal()">💾 SALVAR</button>
+            <button class="btn btn-secondary" onclick="exportarRelatorio()">📄 PDF</button>
         </div>
     </div>
 </div>
 
-<!-- Histórico -->
-<div class="card full-width">
-    <h3>📋 Histórico de Registros</h3>
-    <div class="history-table" id="historico">
-        <div class="empty-history">Nenhum registro encontrado</div>
-    </div>
-    
-    <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn btn-info" onclick="gerarRelatorio()">📑 Relatório Mensal</button>
-        <button class="btn btn-primary" onclick="exportarCSV()">📎 Exportar CSV</button>
-        <button class="btn" style="background:#fc8181; color:white;" onclick="limparHistorico()">🗑️ Limpar Histórico</button>
-    </div>
-</div>
-
-</div>
+<div id="toast" class="toast">Dados salvos!</div>
 
 <script>
-// Configuração inicial
-function configurarData() {
-    let hoje = new Date().toISOString().split('T')[0];
-    document.getElementById("data").value = hoje;
-}
-
-configurarData();
-
-// Relógio
-setInterval(() => {
-    document.getElementById("clock").innerHTML = new Date().toLocaleTimeString('pt-BR');
-}, 1000);
-
-// Converter hora para minutos
-function horaParaMinutos(hora) {
-    if (!hora) return 0;
-    let [hh, mm] = hora.split(":");
-    return parseInt(hh) * 60 + parseInt(mm);
-}
-
-// Mostrar alerta
-function mostrarAlerta(mensagem, tipo = 'success') {
-    let alert = document.createElement('div');
-    alert.className = 'alert';
-    alert.style.background = tipo === 'success' ? '#48bb78' : '#fc8181';
-    alert.style.color = 'white';
-    alert.innerHTML = mensagem;
-    document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 3000);
-}
-
-// Calcular
-function calcular() {
-    let entrada = horaParaMinutos(document.getElementById("entrada").value);
-    let almoco = horaParaMinutos(document.getElementById("almoco").value);
-    let retorno = horaParaMinutos(document.getElementById("retorno").value);
-    let saida = horaParaMinutos(document.getElementById("saida").value);
-    
-    let salario = parseFloat(document.getElementById("salario").value);
-    let adiantamento = parseFloat(document.getElementById("adiantamento").value) || 0;
-    let inssPercent = parseFloat(document.getElementById("inss").value) || 0;
-    let periculosidadePercent = parseFloat(document.getElementById("periculosidade").value) || 30;
-    let insalubridadePercent = parseFloat(document.getElementById("insalubridade").value) || 10;
-    
-    if (!entrada || !almoco || !retorno || !saida) {
-        mostrarAlerta("Preencha todos os horários!", 'error');
-        return;
+    // Relógio Nativo
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').textContent = now.toLocaleTimeString('pt-BR');
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', options).toUpperCase();
     }
-    
-    if (!salario || salario <= 0) {
-        mostrarAlerta("Informe um salário válido!", 'error');
-        return;
-    }
-    
-    // Cálculo de horas trabalhadas
-    let horasTrabalhadas = ((almoco - entrada) + (saida - retorno)) / 60;
-    
-    if (horasTrabalhadas < 0 || horasTrabalhadas > 16) {
-        mostrarAlerta("Verifique os horários informados!", 'error');
-        return;
-    }
-    
-    let horasNormais = Math.min(horasTrabalhadas, 8);
-    let horasExtras = Math.max(horasTrabalhadas - 8, 0);
-    
-    let horas50 = Math.min(horasExtras, 2);
-    let horas100 = Math.max(horasExtras - 2, 0);
-    
-    let valorHora = salario / 220;
-    
-    let totalNormal = horasNormais * valorHora;
-    let total50 = horas50 * valorHora * 1.5;
-    let total100 = horas100 * valorHora * 2;
-    
-    let totalBruto = totalNormal + total50 + total100;
-    
-    // Adicionais
-    let periculosidade = salario * (periculosidadePercent / 100);
-    let insalubridade = salario * (insalubridadePercent / 100);
-    let dsr = totalBruto / 6;
-    
-    let totalAdicionais = periculosidade + insalubridade + dsr;
-    
-    // Descontos
-    let descontoINSS = salario * (inssPercent / 100);
-    
-    let liquido = totalBruto + totalAdicionais - adiantamento - descontoINSS;
-    
-    // Armazenar resultado
-    window.dadosAtual = {
-        data: document.getElementById("data").value,
-        entrada: document.getElementById("entrada").value,
-        almoco: document.getElementById("almoco").value,
-        retorno: document.getElementById("retorno").value,
-        saida: document.getElementById("saida").value,
-        horas: horasTrabalhadas.toFixed(2),
-        normais: horasNormais.toFixed(2),
-        horas50: horas50.toFixed(2),
-        horas100: horas100.toFixed(2),
-        bruto: totalBruto.toFixed(2),
-        adicionalPericulosidade: periculosidade.toFixed(2),
-        adicionalInsalubridade: insalubridade.toFixed(2),
-        dsr: dsr.toFixed(2),
-        inss: descontoINSS.toFixed(2),
-        adiantamento: adiantamento.toFixed(2),
-        liquido: liquido.toFixed(2)
-    };
-    
-    // Exibir resultado
-    document.getElementById("resultado").innerHTML = `
-        <div class="result-stats">
-            <div class="stat-item">
-                <div class="stat-label">Jornada Total</div>
-                <div class="stat-value">${horasTrabalhadas.toFixed(2)}h</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Horas Normais</div>
-                <div class="stat-value">${horasNormais.toFixed(2)}h</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Horas 50%</div>
-                <div class="stat-value">${horas50.toFixed(2)}h</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Horas 100%</div>
-                <div class="stat-value">${horas100.toFixed(2)}h</div>
-            </div>
-        </div>
-        <div class="result-stats">
-            <div class="stat-item">
-                <div class="stat-label">Periculosidade</div>
-                <div class="stat-value">R$ ${periculosidade.toFixed(2)}</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Insalubridade</div>
-                <div class="stat-value">R$ ${insalubridade.toFixed(2)}</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">DSR</div>
-                <div class="stat-value">R$ ${dsr.toFixed(2)}</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">INSS</div>
-                <div class="stat-value">-R$ ${descontoINSS.toFixed(2)}</div>
-            </div>
-        </div>
-        <div class="total-value">
-            💰 LÍQUIDO A RECEBER: R$ ${liquido.toFixed(2)}
-        </div>
-    `;
-}
+    setInterval(updateClock, 1000);
+    updateClock();
 
-// Salvar no localStorage
-function salvar() {
-    if (!window.dadosAtual) {
-        mostrarAlerta("Calcule o rendimento primeiro!", 'error');
-        return;
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.opacity = '1';
+        t.style.bottom = '50px';
+        setTimeout(() => {
+            t.style.opacity = '0';
+            t.style.bottom = '30px';
+        }, 2000);
     }
-    
-    let lista = JSON.parse(localStorage.getItem("ponto_pro") || "[]");
-    
-    // Verificar duplicata
-    let existe = lista.some(item => item.data === window.dadosAtual.data);
-    if (existe) {
-        if(confirm("Data já registrada! Deseja substituir?")) {
-            lista = lista.filter(item => item.data !== window.dadosAtual.data);
-        } else {
+
+    function timeToMin(t) {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    }
+
+    function calcular() {
+        const salario = parseFloat(document.getElementById('salario').value) || 0;
+        if(salario <= 0) {
+            showToast("Defina o salário primeiro!");
             return;
         }
-    }
-    
-    lista.push(window.dadosAtual);
-    lista.sort((a,b) => new Date(b.data) - new Date(a.data));
-    
-    localStorage.setItem("ponto_pro", JSON.stringify(lista));
-    carregarHistorico();
-    mostrarAlerta("Registro salvo com sucesso!", 'success');
-}
 
-// Carregar histórico
-function carregarHistorico() {
-    let lista = JSON.parse(localStorage.getItem("ponto_pro") || "[]");
-    let container = document.getElementById("historico");
-    
-    if (lista.length === 0) {
-        container.innerHTML = '<div class="empty-history">Nenhum registro encontrado</div>';
-        return;
-    }
-    
-    let html = "";
-    let totalPonto = 0;
-    let totalReceber = 0;
-    
-    lista.forEach((item, index) => {
-        totalPonto += parseFloat(item.horas);
-        totalReceber += parseFloat(item.liquido);
+        const t1 = timeToMin(document.getElementById('entrada').value);
+        const t2 = timeToMin(document.getElementById('almocoSaida').value);
+        const t3 = timeToMin(document.getElementById('almocoRetorno').value);
+        const t4 = timeToMin(document.getElementById('saidaFinal').value);
+
+        const minTrabalhados = (t2 - t1) + (t4 - t3);
+        const horasDia = minTrabalhados / 60;
+        const valorHora = salario / 220;
         
-        html += `
-            <div class="history-item">
-                <div>
-                    <div class="history-date">📅 ${item.data}</div>
-                    <div style="font-size: 12px; color: #888;">
-                        ${item.entrada} → ${item.almoco} | ${item.retorno} → ${item.saida}
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div class="history-hours">${item.horas}h</div>
-                    <div class="history-value">R$ ${item.liquido}</div>
-                    <button class="delete-btn" onclick="excluirRegistro('${item.data}')">Excluir</button>
+        // Simulação Mensal (22 dias úteis)
+        const dias = 22;
+        const extrasDia = Math.max(0, horasDia - 8);
+        const valorExtras = (extrasDia * valorHora * 1.5) * dias;
+        const periculosidade = salario * 0.3;
+        const dsr = valorExtras / 6;
+        const inss = (salario + valorExtras + periculosidade) * 0.09; // Simplificado
+        const liquido = (salario + valorExtras + periculosidade + dsr) - inss;
+
+        const area = document.getElementById('resultadoArea');
+        area.innerHTML = `
+            <div class="glass-card" style="border-left: 4px solid var(--primary)">
+                <h3>🧾 Demonstrativo Mensal</h3>
+                <div class="res-line"><span>Jornada Diária</span><strong>${horasDia.toFixed(2)}h</strong></div>
+                <div class="res-line"><span>Salário Base</span><strong>R$ ${salario.toFixed(2)}</strong></div>
+                <div class="res-line"><span>Horas Extras (50%)</span><strong>R$ ${valorExtras.toFixed(2)}</strong></div>
+                <div class="res-line"><span>DSR s/ Extras</span><strong>R$ ${dsr.toFixed(2)}</strong></div>
+                <div class="res-line"><span>Periculosidade (30%)</span><strong>R$ ${periculosidade.toFixed(2)}</strong></div>
+                <div class="res-line"><span>Desconto INSS</span><strong style="color:#ffb4a2">- R$ ${inss.toFixed(2)}</strong></div>
+                <div class="res-total">
+                    <span>Líquido Estimado</span>
+                    <strong>R$ ${liquido.toFixed(2)}</strong>
                 </div>
             </div>
         `;
-    });
-    
-    html += `
-        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 15px; border-radius: 10px; color: white; margin-top: 15px;">
-            <div style="display: flex; justify-content: space-between;">
-                <span>📊 Total de Horas:</span>
-                <strong>${totalPonto.toFixed(2)}h</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-                <span>💰 Total a Receber:</span>
-                <strong>R$ ${totalReceber.toFixed(2)}</strong>
-            </div>
-        </div>
-    `;
-    
-    container.innerHTML = html;
-}
-
-// Excluir registro
-function excluirRegistro(data) {
-    if(confirm(`Excluir registro do dia ${data}?`)) {
-        let lista = JSON.parse(localStorage.getItem("ponto_pro") || "[]");
-        lista = lista.filter(item => item.data !== data);
-        localStorage.setItem("ponto_pro", JSON.stringify(lista));
-        carregarHistorico();
-        mostrarAlerta("Registro excluído!", 'success');
+        area.scrollIntoView({ behavior: 'smooth' });
     }
-}
 
-// Gerar relatório mensal
-function gerarRelatorio() {
-    let lista = JSON.parse(localStorage.getItem("ponto_pro") || "[]");
-    
-    if (lista.length === 0) {
-        mostrarAlerta("Nenhum registro encontrado!", 'error');
-        return;
+    function salvarLocal() {
+        const dados = {
+            nome: document.getElementById('nome').value,
+            salario: document.getElementById('salario').value,
+            admissao: document.getElementById('admissao').value
+        };
+        localStorage.setItem('pontoPro_User', JSON.stringify(dados));
+        showToast("Dados salvos no aparelho!");
     }
-    
-    let meses = {};
-    lista.forEach(item => {
-        let mes = item.data.substring(0, 7);
-        if (!meses[mes]) {
-            meses[mes] = { horas: 0, valor: 0, dias: 0 };
+
+    window.onload = () => {
+        const saved = JSON.parse(localStorage.getItem('pontoPro_User'));
+        if(saved) {
+            document.getElementById('nome').value = saved.nome || '';
+            document.getElementById('salario').value = saved.salario || '';
+            document.getElementById('admissao').value = saved.admissao || '';
         }
-        meses[mes].horas += parseFloat(item.horas);
-        meses[mes].valor += parseFloat(item.liquido);
-        meses[mes].dias++;
-    });
-    
-    let relatorio = "📋 RELATÓRIO MENSAL\n" + "=".repeat(40) + "\n\n";
-    
-    for (let mes in meses) {
-        let [ano, mesNum] = mes.split('-');
-        let nomeMes = new Date(ano, mesNum - 1).toLocaleString('pt-BR', { month: 'long' });
-        relatorio += `📆 ${nomeMes.toUpperCase()}/${ano}\n`;
-        relatorio += `   Dias trabalhados: ${meses[mes].dias}\n`;
-        relatorio += `   Total de horas: ${meses[mes].horas.toFixed(2)}h\n`;
-        relatorio += `   Média diária: ${(meses[mes].horas / meses[mes].dias).toFixed(2)}h\n`;
-        relatorio += `   Total líquido: R$ ${meses[mes].valor.toFixed(2)}\n`;
-        relatorio += `   Média diária: R$ ${(meses[mes].valor / meses[mes].dias).toFixed(2)}\n\n`;
     }
-    
-    alert(relatorio);
-}
 
-// Exportar CSV
-function exportarCSV() {
-    let lista = JSON.parse(localStorage.getItem("ponto_pro") || "[]");
-    
-    if (lista.length === 0) {
-        mostrarAlerta("Nenhum registro para exportar!", 'error');
-        return;
+    function exportarRelatorio() {
+        showToast("Gerando PDF...");
+        setTimeout(() => window.print(), 500);
     }
-    
-    let csv = "Data,Entrada,Almoço,Retorno,Saída,Horas,Valor Líquido\n";
-    lista.forEach(item => {
-        csv += `${item.data},${item.entrada},${item.almoco},${item.retorno},${item.saida},${item.horas},${item.liquido}\n`;
-    });
-    
-    let blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    let link = document.createElement("a");
-    let url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "relatorio_ponto.csv");
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    mostrarAlerta("Relatório exportado com sucesso!", 'success');
-}
-
-// Limpar histórico
-function limparHistorico() {
-    if(confirm("⚠️ ATENÇÃO: Isso apagará TODOS os registros. Continuar?")) {
-        localStorage.removeItem("ponto_pro");
-        carregarHistorico();
-        mostrarAlerta("Histórico limpo!", 'success');
-    }
-}
-
-// Inicializar
-carregarHistorico();
-
-// Validação de horários
-document.getElementById("entrada").addEventListener("change", function() {
-    let dataAtual = new Date().toLocaleDateString('pt-BR');
-    console.log("Horário registrado em:", dataAtual);
-});
-
 </script>
 
 </body>
