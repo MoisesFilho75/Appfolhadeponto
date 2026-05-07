@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0B2B2F">
-    <title>Ponto PRO | Relatório Oficial</title>
+    <title>Ponto PRO | v7.0</title>
     <style>
-        /* Estilos Visuais do App */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
         
         body {
@@ -39,12 +38,27 @@
             padding: 12px; font-size: 1rem; font-weight: 600; color: #0A2F2F; outline: none;
         }
 
+        .valores-tabela {
+            margin-top: 15px; padding: 12px; background: rgba(0, 229, 160, 0.05);
+            border-radius: 15px; border: 1px solid rgba(0, 229, 160, 0.2);
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .valor-item { display: flex; justify-content: space-between; font-size: 0.8rem; }
+        .valor-item b { color: #00E5A0; }
+
+        .acumulado-total {
+            background: #00E5A0; color: #042020; padding: 20px;
+            border-radius: 20px; margin-bottom: 15px; text-align: center;
+        }
+        .acumulado-valor { font-size: 2rem; font-weight: 900; }
+
         .grid-horas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         button {
             height: 54px; background: #00D68F; color: #042020;
             border: none; border-radius: 16px; font-size: 1rem;
-            font-weight: 800; width: 100%; cursor: pointer; transition: 0.2s;
+            font-weight: 800; width: 100%; cursor: pointer;
         }
 
         .resumo-card {
@@ -57,32 +71,20 @@
             padding: 15px; margin-bottom: 10px; border-left: 4px solid #00E5A0;
         }
 
-        .tag-tipo { padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; color: #000; font-weight: bold; }
-
         .btn-acao {
             background: rgba(255, 255, 255, 0.1); color: white;
             border: 1px solid rgba(255, 255, 255, 0.2); height: 45px;
-            border-radius: 12px; font-size: 0.8rem; cursor: pointer; font-weight: bold; width: 100%;
+            border-radius: 12px; font-size: 0.75rem; cursor: pointer; font-weight: bold;
         }
 
-        /* --- CONFIGURAÇÃO CRÍTICA PARA PDF/IMPRESSÃO --- */
+        /* AJUSTE PARA PDF/IMPRESSÃO */
         @media print {
-            @page { margin: 1cm; }
             body { background: white !important; color: black !important; }
             .header-card, .card, button, .btn-acao, footer { display: none !important; }
-            .container { max-width: 100% !important; width: 100% !important; }
-            .resumo-card { 
-                background: white !important; border: 1px solid #00E5A0 !important; 
-                color: black !important; width: 100% !important; padding: 0 !important;
-            }
-            .item-ponto { 
-                background: white !important; border: 1px solid #eee !important; 
-                color: black !important; page-break-inside: avoid; 
-                margin-bottom: 10px !important;
-            }
-            .tag-tipo { border: 1px solid #000 !important; background: #eee !important; }
-            #historico { color: black !important; }
-            .detalhe-hora { color: #666 !important; }
+            .resumo-card { background: white !important; border: none !important; color: black !important; width: 100% !important; }
+            .acumulado-total { background: #eee !important; color: black !important; border: 2px solid #000 !important; }
+            .item-ponto { border: 1px solid #ccc !important; color: black !important; page-break-inside: avoid; }
+            .tag-tipo { border: 1px solid #000 !important; }
         }
 
         footer { text-align: center; font-size: 0.65rem; opacity: 0.4; margin: 20px 0; }
@@ -93,23 +95,28 @@
 <div class="container">
     <header class="header-card">
         <div class="clock" id="liveClock">00:00:00</div>
-        <div id="currentDateDisplay" style="font-size: 0.8rem; margin-top:5px;"></div>
+        <div id="currentDateDisplay"></div>
     </header>
 
     <div class="card">
         <h3>👤 Identificação</h3>
         <div class="input-group">
-            <label>Nome do Funcionário</label>
-            <input type="text" id="nomeFuncionario" placeholder="Ex: João Silva">
+            <label>Nome</label>
+            <input type="text" id="nomeFuncionario" placeholder="Nome">
         </div>
         <div class="input-group">
             <label>Salário Base (R$)</label>
-            <input type="text" id="salario" placeholder="3.000,00" inputmode="decimal">
+            <input type="text" id="salario" placeholder="Ex: 3.000,00" inputmode="decimal" oninput="atualizarValores()">
+        </div>
+        <div class="valores-tabela">
+            <div class="valor-item">Hora Normal: <b id="vHoraBase">R$ 0,00</b></div>
+            <div class="valor-item">Extra 50%: <b id="vHora50">R$ 0,00</b></div>
+            <div class="valor-item">Extra 100%: <b id="vHora100">R$ 0,00</b></div>
         </div>
     </div>
 
     <div class="card">
-        <h3>📅 Lançamento</h3>
+        <h3>📅 Lançar Ponto</h3>
         <div class="input-group">
             <label>Data</label>
             <input type="date" id="dataRegistro">
@@ -122,26 +129,32 @@
         </div>
         <div class="input-group">
             <label>Justificativa</label>
-            <textarea id="justificativa" placeholder="Ex: Feriado trabalhado..."></textarea>
+            <textarea id="justificativa" placeholder="Opcional..."></textarea>
         </div>
-        <button onclick="adicionarPonto()">💾 ADICIONAR AO RESUMO</button>
+        <button onclick="adicionarPonto()">💾 ADICIONAR AO HISTÓRICO</button>
     </div>
 
-    <div class="resumo-card" id="areaResumo">
-        <h3>📋 Relatório para PDF</h3>
+    <div class="resumo-card">
+        <h3>📋 Relatório Acumulado</h3>
+        <div class="acumulado-total">
+            <div style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">TOTAL GERAL</div>
+            <div class="acumulado-valor" id="totalGeralAcumulado">R$ 0,00</div>
+            <div style="font-size: 0.6rem; font-weight: bold;" id="qtdDias">0 dias</div>
+        </div>
+
         <div id="historico"></div>
         
-        <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="btn-acao" onclick="imprimirPDF()">📄 GERAR PDF</button>
-            <button class="btn-acao" style="color:#FFB4A2" onclick="limparHistorico()">🗑️ LIMPAR</button>
+        <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button class="btn-acao" onclick="window.print()">📄 IMPRIMIR / PDF</button>
+            <button class="btn-acao" onclick="baixarRelatorio()">📥 SALVAR TXT</button>
+            <button class="btn-acao" style="grid-column: span 2; color:#FFB4A2" onclick="limparHistorico()">🗑️ LIMPAR TUDO</button>
         </div>
     </div>
 
-    <footer>Ponto PRO | v3.0</footer>
+    <footer>Ponto PRO | v7.0</footer>
 </div>
 
 <script>
-    // Relógio
     setInterval(() => {
         const agora = new Date();
         document.getElementById('liveClock').innerText = agora.toLocaleTimeString('pt-BR');
@@ -150,97 +163,74 @@
 
     document.getElementById('dataRegistro').value = new Date().toISOString().split('T')[0];
 
-    const feriados2026 = {
-        "2026-05-01": "Dia do Trabalho", "2026-05-10": "Dia das Mães (100%)",
-        "2026-09-07": "Independência", "2026-12-25": "Natal"
-    };
-
+    const feriados2026 = { "2026-05-01": "Trabalho", "2026-05-10": "Mães", "2026-12-25": "Natal" };
     let registros = JSON.parse(localStorage.getItem('ponto_registros')) || [];
 
+    function atualizarValores() {
+        const sal = parseFloat(document.getElementById('salario').value.replace(/\./g, '').replace(',', '.')) || 0;
+        const hBase = sal / 220;
+        const f = (v) => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+        document.getElementById('vHoraBase').innerText = f(hBase);
+        document.getElementById('vHora50').innerText = f(hBase * 1.5);
+        document.getElementById('vHora100').innerText = f(hBase * 2);
+    }
+
     function adicionarPonto() {
-        const salBaseStr = document.getElementById('salario').value;
+        const salStr = document.getElementById('salario').value;
         const data = document.getElementById('dataRegistro').value;
-        
-        if (!salBaseStr || !data) return alert("Informe salário e data!");
+        if (!salStr || !data) return alert("Preencha Salário e Data!");
 
-        const salLimpo = parseFloat(salBaseStr.replace(/\./g, '').replace(',', '.'));
-        const valorHoraNormal = salLimpo / 220;
-        
+        const sal = parseFloat(salStr.replace(/\./g, '').replace(',', '.'));
+        const vBase = sal / 220;
         const hParaM = (h) => h.split(':').reduce((p, c) => p * 60 + +c);
-        const minTrabalhados = (hParaM(document.getElementById('t4').value) - hParaM(document.getElementById('t3').value)) +
-                               (hParaM(document.getElementById('t2').value) - hParaM(document.getElementById('t1').value));
-        const horasTotais = minTrabalhados / 60;
-
-        const dataObj = new Date(data + "T00:00:00");
-        const diaSemana = dataObj.getDay();
+        const min = (hParaM(document.getElementById('t4').value) - hParaM(document.getElementById('t3').value)) +
+                    (hParaM(document.getElementById('t2').value) - hParaM(document.getElementById('t1').value));
+        const hTotais = min / 60;
+        const diaS = new Date(data + "T00:00:00").getDay();
         const feriado = feriados2026[data];
 
-        let perc = 0, tipoLabel = "Normal", vHoraCalc = valorHoraNormal;
+        let vFinal = (feriado || diaS === 0) ? vBase * 2 : (diaS === 6 || hTotais > 8) ? vBase * 1.5 : vBase;
+        let ganho = ( (feriado || diaS === 0 || diaS === 6) ? hTotais * vFinal : (Math.min(hTotais, 8) * vBase) + (Math.max(0, hTotais - 8) * vBase * 1.5) ) + ((sal * 0.3) / 22);
 
-        if (feriado || diaSemana === 0) {
-            perc = 100; tipoLabel = feriado || "Domingo (100%)"; vHoraCalc = valorHoraNormal * 2;
-        } else if (diaSemana === 6) {
-            perc = 50; tipoLabel = "Sábado (50%)"; vHoraCalc = valorHoraNormal * 1.5;
-        } else if (horasTotais > 8) {
-            perc = 50; tipoLabel = "Extra 50%";
-        }
-
-        let ganhoDia = 0;
-        if (perc === 100 || (perc === 50 && diaSemana === 6)) {
-            ganhoDia = horasTotais * vHoraCalc;
-        } else {
-            ganhoDia = (Math.min(horasTotais, 8) * valorHoraNormal) + (Math.max(0, horasTotais - 8) * valorHoraNormal * 1.5);
-        }
-        
-        ganhoDia += (salLimpo * 0.3) / 22; // Periculosidade
-
-        const format = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-        registros.unshift({
-            data, tipo: tipoLabel, horas: horasTotais.toFixed(2),
-            vBase: format(valorHoraNormal), vFinal: format(vHoraCalc),
-            total: format(ganhoDia), obs: document.getElementById('justificativa').value,
-            cor: (perc === 100 ? '#FF4B2B' : (perc === 50 ? '#FFA500' : '#00E5A0'))
-        });
-
+        registros.unshift({ data, h: hTotais.toFixed(2), ganho, obs: document.getElementById('justificativa').value, label: feriado || (diaS === 0 ? "Dom" : diaS === 6 ? "Sáb" : "Normal") });
         localStorage.setItem('ponto_registros', JSON.stringify(registros));
-        localStorage.setItem('ponto_perfil', JSON.stringify({ nome: document.getElementById('nomeFuncionario').value, salario: salBaseStr }));
         renderizar();
     }
 
     function renderizar() {
         const div = document.getElementById('historico');
-        div.innerHTML = registros.map(item => `
-            <div class="item-ponto">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <strong style="color:inherit">📅 ${item.data.split('-').reverse().join('/')}</strong>
-                    <span class="tag-tipo" style="background:${item.cor}">${item.tipo}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
-                    <span>Horas: ${item.horas}h <br> <small>Base: ${item.vBase} | Final: ${item.vFinal}</small></span>
-                    <strong style="font-size:1.1rem; color:#00E5A0">${item.total}</strong>
-                </div>
-                ${item.obs ? `<div style="font-size:0.7rem; color:#FFA500; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:5px;">💬 ${item.obs}</div>` : ''}
-            </div>
-        `).join('');
+        let total = 0;
+        div.innerHTML = registros.map(r => {
+            total += r.ganho;
+            return `<div class="item-ponto">
+                <div style="display:flex; justify-content:space-between"><b>📅 ${r.data.split('-').reverse().join('/')}</b> <span>${r.label}</span></div>
+                <div style="display:flex; justify-content:space-between; margin-top:5px"><span>${r.h}h trabalhadas</span> <b style="color:#00E5A0">${r.ganho.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</b></div>
+                ${r.obs ? `<div style="font-size:0.7rem; color:orange; border-top:1px solid #333; margin-top:5px">💬 ${r.obs}</div>` : ''}
+            </div>`;
+        }).join('');
+        document.getElementById('totalGeralAcumulado').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+        document.getElementById('qtdDias').innerText = `${registros.length} dia(s) no total`;
     }
 
-    function imprimirPDF() {
-        if (registros.length === 0) return alert("Adicione ao menos um dia!");
-        window.print();
+    function baixarRelatorio() {
+        if (registros.length === 0) return alert("Sem dados!");
+        const nome = document.getElementById('nomeFuncionario').value || "Funcionario";
+        let txt = `RELATORIO PONTO - ${nome}\nTOTAL: ${document.getElementById('totalGeralAcumulado').innerText}\n\n`;
+        registros.forEach(r => txt += `${r.data} | ${r.h}h | ${r.ganho.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}\n`);
+        
+        // Técnica compatível com Mobile
+        const blob = new Blob([txt], { type: "text/plain" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `Relatorio_Ponto_${nome}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
-    function limparHistorico() {
-        if(confirm("Limpar tudo?")) {
-            registros = []; localStorage.removeItem('ponto_registros'); renderizar();
-        }
-    }
+    function limparHistorico() { if(confirm("Limpar tudo?")) { registros = []; localStorage.clear(); renderizar(); } }
 
-    window.onload = () => {
-        const p = JSON.parse(localStorage.getItem('ponto_perfil'));
-        if (p) { document.getElementById('nomeFuncionario').value = p.nome; document.getElementById('salario').value = p.salario; }
-        renderizar();
-    };
+    window.onload = renderizar;
 </script>
 </body>
 </html>
