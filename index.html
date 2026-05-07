@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0B2B2F">
-    <title>Ponto PRO | v7.0</title>
+    <title>Ponto PRO | Sistema Completo</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
         
@@ -38,56 +38,127 @@
             padding: 12px; font-size: 1rem; font-weight: 600; color: #0A2F2F; outline: none;
         }
 
-        .valores-tabela {
-            margin-top: 15px; padding: 12px; background: rgba(0, 229, 160, 0.05);
-            border-radius: 15px; border: 1px solid rgba(0, 229, 160, 0.2);
-            display: flex; flex-direction: column; gap: 8px;
+        /* Tabela de Valores - Destaque */
+        .tabela-valores {
+            background: rgba(0, 229, 160, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(0, 229, 160, 0.3);
         }
 
-        .valor-item { display: flex; justify-content: space-between; font-size: 0.8rem; }
-        .valor-item b { color: #00E5A0; }
-
-        .acumulado-total {
-            background: #00E5A0; color: #042020; padding: 20px;
-            border-radius: 20px; margin-bottom: 15px; text-align: center;
+        .tabela-valores h4 {
+            font-size: 0.7rem;
+            margin-bottom: 10px;
+            color: #00E5A0;
+            text-align: center;
+            text-transform: uppercase;
         }
-        .acumulado-valor { font-size: 2rem; font-weight: 900; }
+
+        .linha-valor {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .linha-valor:last-child {
+            border-bottom: none;
+        }
+
+        .linha-valor .label {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .linha-valor .valor {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #00E5A0;
+        }
 
         .grid-horas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         button {
             height: 54px; background: #00D68F; color: #042020;
             border: none; border-radius: 16px; font-size: 1rem;
-            font-weight: 800; width: 100%; cursor: pointer;
+            font-weight: 800; width: 100%; cursor: pointer; transition: 0.2s;
         }
+
+        button:active { transform: scale(0.98); }
 
         .resumo-card {
             background: #071E1E; border-radius: 24px; padding: 20px;
             margin-top: 10px; border: 2px solid #00E5A0;
         }
 
+        .acumulado-total {
+            background: #00E5A0; color: #042020; padding: 15px;
+            border-radius: 16px; margin-bottom: 15px; text-align: center;
+        }
+
+        .acumulado-valor { font-size: 1.8rem; font-weight: 900; }
+
         .item-ponto {
             background: rgba(255, 255, 255, 0.05); border-radius: 15px;
             padding: 15px; margin-bottom: 10px; border-left: 4px solid #00E5A0;
         }
 
+        .tag-tipo { 
+            padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; 
+            color: #000; font-weight: bold; 
+        }
+
         .btn-acao {
             background: rgba(255, 255, 255, 0.1); color: white;
             border: 1px solid rgba(255, 255, 255, 0.2); height: 45px;
-            border-radius: 12px; font-size: 0.75rem; cursor: pointer; font-weight: bold;
+            border-radius: 12px; font-size: 0.8rem; cursor: pointer; font-weight: bold; width: 100%;
         }
 
-        /* AJUSTE PARA PDF/IMPRESSÃO */
+        .btn-remover {
+            margin-top: 10px;
+            background: rgba(255, 80, 80, 0.3);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            width: auto;
+            height: auto;
+        }
+
+        /* Impressão */
         @media print {
+            @page { margin: 1cm; }
             body { background: white !important; color: black !important; }
-            .header-card, .card, button, .btn-acao, footer { display: none !important; }
-            .resumo-card { background: white !important; border: none !important; color: black !important; width: 100% !important; }
-            .acumulado-total { background: #eee !important; color: black !important; border: 2px solid #000 !important; }
-            .item-ponto { border: 1px solid #ccc !important; color: black !important; page-break-inside: avoid; }
-            .tag-tipo { border: 1px solid #000 !important; }
+            .header-card, .card, button, .btn-acao, footer, .btn-remover { display: none !important; }
+            .container { max-width: 100% !important; width: 100% !important; }
+            .resumo-card { 
+                background: white !important; border: 1px solid #00E5A0 !important; 
+                color: black !important; width: 100% !important; padding: 0 !important;
+            }
+            .item-ponto { 
+                background: white !important; border: 1px solid #eee !important; 
+                color: black !important; page-break-inside: avoid; 
+            }
+            .acumulado-total { background: #f0f0f0 !important; border: 1px solid #000 !important; }
         }
 
         footer { text-align: center; font-size: 0.65rem; opacity: 0.4; margin: 20px 0; }
+        
+        .feedback {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #00E5A0; color: #042020; padding: 12px 24px;
+            border-radius: 50px; font-weight: bold; z-index: 1000;
+            animation: fadeOut 2s forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
     </style>
 </head>
 <body>
@@ -95,26 +166,40 @@
 <div class="container">
     <header class="header-card">
         <div class="clock" id="liveClock">00:00:00</div>
-        <div id="currentDateDisplay"></div>
+        <div id="currentDateDisplay" style="font-size: 0.8rem; margin-top:5px;"></div>
     </header>
 
+    <!-- Card de Identificação e Salário -->
     <div class="card">
         <h3>👤 Identificação</h3>
         <div class="input-group">
-            <label>Nome</label>
-            <input type="text" id="nomeFuncionario" placeholder="Nome">
+            <label>Nome do Funcionário</label>
+            <input type="text" id="nomeFuncionario" placeholder="Ex: João Silva">
         </div>
         <div class="input-group">
             <label>Salário Base (R$)</label>
-            <input type="text" id="salario" placeholder="Ex: 3.000,00" inputmode="decimal" oninput="atualizarValores()">
+            <input type="text" id="salario" placeholder="3.000,00" inputmode="decimal" oninput="calcularValoresHora()">
         </div>
-        <div class="valores-tabela">
-            <div class="valor-item">Hora Normal: <b id="vHoraBase">R$ 0,00</b></div>
-            <div class="valor-item">Extra 50%: <b id="vHora50">R$ 0,00</b></div>
-            <div class="valor-item">Extra 100%: <b id="vHora100">R$ 0,00</b></div>
+        
+        <!-- Tabela de Valores por Hora -->
+        <div class="tabela-valores">
+            <h4>💰 VALORES POR HORA TRABALHADA</h4>
+            <div class="linha-valor">
+                <span class="label">📌 Hora Normal (220h/mês)</span>
+                <span class="valor" id="valorHoraNormal">R$ 0,00</span>
+            </div>
+            <div class="linha-valor">
+                <span class="label">⭐ Hora Extra 50%</span>
+                <span class="valor" id="valorHoraExtra50">R$ 0,00</span>
+            </div>
+            <div class="linha-valor">
+                <span class="label">🔥 Hora Extra 100% (Domingo/Feriado)</span>
+                <span class="valor" id="valorHoraExtra100">R$ 0,00</span>
+            </div>
         </div>
     </div>
 
+    <!-- Card de Lançamento -->
     <div class="card">
         <h3>📅 Lançar Ponto</h3>
         <div class="input-group">
@@ -128,109 +213,418 @@
             <div class="input-group"><label>Saída Final</label><input type="time" id="t4" value="17:00"></div>
         </div>
         <div class="input-group">
-            <label>Justificativa</label>
-            <textarea id="justificativa" placeholder="Opcional..."></textarea>
+            <label>Justificativa (opcional)</label>
+            <textarea id="justificativa" rows="2" placeholder="Ex: Hora extra autorizada..."></textarea>
         </div>
-        <button onclick="adicionarPonto()">💾 ADICIONAR AO HISTÓRICO</button>
+        <button onclick="adicionarPonto()">💾 ADICIONAR AO RESUMO</button>
     </div>
 
-    <div class="resumo-card">
-        <h3>📋 Relatório Acumulado</h3>
+    <!-- Card de Relatório -->
+    <div class="resumo-card" id="areaResumo">
+        <h3>📋 RELATÓRIO ACUMULADO</h3>
+        
         <div class="acumulado-total">
-            <div style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">TOTAL GERAL</div>
-            <div class="acumulado-valor" id="totalGeralAcumulado">R$ 0,00</div>
-            <div style="font-size: 0.6rem; font-weight: bold;" id="qtdDias">0 dias</div>
+            <div style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">TOTAL GERAL ACUMULADO</div>
+            <div class="acumulado-valor" id="totalGeral">R$ 0,00</div>
+            <div style="font-size: 0.65rem; font-weight: bold;" id="contadorDias">0 dias registrados</div>
         </div>
-
+        
         <div id="historico"></div>
         
-        <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <button class="btn-acao" onclick="window.print()">📄 IMPRIMIR / PDF</button>
-            <button class="btn-acao" onclick="baixarRelatorio()">📥 SALVAR TXT</button>
-            <button class="btn-acao" style="grid-column: span 2; color:#FFB4A2" onclick="limparHistorico()">🗑️ LIMPAR TUDO</button>
+        <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="btn-acao" onclick="gerarPDF()">📄 GERAR PDF</button>
+            <button class="btn-acao" style="color:#FFB4A2" onclick="limparHistorico()">🗑️ LIMPAR TUDO</button>
         </div>
     </div>
 
-    <footer>Ponto PRO | v7.0</footer>
+    <footer>Ponto PRO | Sistema Completo v4.0</footer>
 </div>
 
 <script>
+    // ==================== CONFIGURAÇÕES INICIAIS ====================
+    
+    // Feriados 2026 (pode adicionar mais)
+    const feriados2026 = {
+        "2026-01-01": "Confraternização Universal",
+        "2026-03-03": "Carnaval",
+        "2026-03-04": "Carnaval",
+        "2026-04-18": "Paixão de Cristo",
+        "2026-04-21": "Tiradentes",
+        "2026-05-01": "Dia do Trabalho",
+        "2026-06-04": "Corpus Christi",
+        "2026-09-07": "Independência do Brasil",
+        "2026-10-12": "Nossa Senhora Aparecida",
+        "2026-11-02": "Finados",
+        "2026-11-15": "Proclamação da República",
+        "2026-12-25": "Natal"
+    };
+    
+    // Array de registros
+    let registros = [];
+    
+    // ==================== FUNÇÕES DE PERSISTÊNCIA ====================
+    
+    function carregarDados() {
+        // Carregar registros
+        const salvos = localStorage.getItem('ponto_registros');
+        if (salvos) {
+            try {
+                registros = JSON.parse(salvos);
+                console.log("Registros carregados:", registros.length);
+            } catch(e) {
+                registros = [];
+            }
+        }
+        
+        // Carregar perfil
+        const perfil = localStorage.getItem('ponto_perfil');
+        if (perfil) {
+            try {
+                const p = JSON.parse(perfil);
+                document.getElementById('nomeFuncionario').value = p.nome || '';
+                document.getElementById('salario').value = p.salario || '';
+                calcularValoresHora();
+            } catch(e) {}
+        }
+    }
+    
+    function salvarDados() {
+        localStorage.setItem('ponto_registros', JSON.stringify(registros));
+        localStorage.setItem('ponto_perfil', JSON.stringify({
+            nome: document.getElementById('nomeFuncionario').value,
+            salario: document.getElementById('salario').value
+        }));
+        console.log("Dados salvos. Total registros:", registros.length);
+    }
+    
+    // ==================== CÁLCULO DOS VALORES POR HORA ====================
+    
+    function calcularValoresHora() {
+        const salarioStr = document.getElementById('salario').value;
+        if (!salarioStr) {
+            document.getElementById('valorHoraNormal').innerText = 'R$ 0,00';
+            document.getElementById('valorHoraExtra50').innerText = 'R$ 0,00';
+            document.getElementById('valorHoraExtra100').innerText = 'R$ 0,00';
+            return;
+        }
+        
+        // Converter salário (ex: "3.000,00" ou "3000" ou "3000,00")
+        let salarioNum = salarioStr.replace(/\./g, '').replace(',', '.');
+        salarioNum = parseFloat(salarioNum) || 0;
+        
+        const horaNormal = salarioNum / 220;
+        const horaExtra50 = horaNormal * 1.5;
+        const horaExtra100 = horaNormal * 2;
+        
+        document.getElementById('valorHoraNormal').innerText = formatarMoeda(horaNormal);
+        document.getElementById('valorHoraExtra50').innerText = formatarMoeda(horaExtra50);
+        document.getElementById('valorHoraExtra100').innerText = formatarMoeda(horaExtra100);
+        
+        return { horaNormal, horaExtra50, horaExtra100, salarioNum };
+    }
+    
+    // ==================== FUNÇÕES AUXILIARES ====================
+    
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+    
+    function mostrarFeedback(mensagem, cor = '#00E5A0') {
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.textContent = mensagem;
+        feedback.style.backgroundColor = cor;
+        feedback.style.color = cor === '#00E5A0' ? '#042020' : 'white';
+        document.body.appendChild(feedback);
+        setTimeout(() => {
+            if (feedback && feedback.remove) feedback.remove();
+        }, 2000);
+    }
+    
+    // Converter hora para minutos
+    function horaParaMinutos(hora) {
+        const [horas, minutos] = hora.split(':').map(Number);
+        return horas * 60 + minutos;
+    }
+    
+    // ==================== CÁLCULO DO DIA TRABALHADO ====================
+    
+    function calcularGanhoDia(data, horasTrabalhadas, salarioNum, valorHoraNormal) {
+        const dataObj = new Date(data + "T00:00:00");
+        const diaSemana = dataObj.getDay(); // 0=Domingo, 6=Sábado
+        const ehFeriado = feriados2026[data] !== undefined;
+        
+        let ganho = 0;
+        let tipoDia = "";
+        let percentual = 0;
+        
+        if (ehFeriado) {
+            // Feriado: 100% extra (dobro)
+            ganho = horasTrabalhadas * valorHoraNormal * 2;
+            tipoDia = `🔴 FERIADO - ${feriados2026[data]}`;
+            percentual = 100;
+        }
+        else if (diaSemana === 0) {
+            // Domingo: 100% extra (dobro)
+            ganho = horasTrabalhadas * valorHoraNormal * 2;
+            tipoDia = "🔴 DOMINGO (100%)";
+            percentual = 100;
+        }
+        else if (diaSemana === 6) {
+            // Sábado: 50% extra
+            ganho = horasTrabalhadas * valorHoraNormal * 1.5;
+            tipoDia = "🟡 SÁBADO (50%)";
+            percentual = 50;
+        }
+        else {
+            // Dias úteis: até 8h normal, acima 50% extra
+            const horasNormais = Math.min(horasTrabalhadas, 8);
+            const horasExtras = Math.max(0, horasTrabalhadas - 8);
+            ganho = (horasNormais * valorHoraNormal) + (horasExtras * valorHoraNormal * 1.5);
+            
+            if (horasExtras > 0) {
+                tipoDia = `🟢 DIA ÚTIL (${horasExtras.toFixed(1)}h extra 50%)`;
+            } else {
+                tipoDia = "🟢 DIA ÚTIL";
+            }
+            percentual = horasExtras > 0 ? 50 : 0;
+        }
+        
+        // Adicionar periculosidade: 30% sobre salário base / 22 dias úteis
+        const periculosidadeDia = (salarioNum * 0.3) / 22;
+        ganho += periculosidadeDia;
+        
+        return { ganho, tipoDia, percentual };
+    }
+    
+    // ==================== ADICIONAR PONTO ====================
+    
+    function adicionarPonto() {
+        console.log("=== ADICIONANDO PONTO ===");
+        
+        // 1. Validar salário
+        const salarioStr = document.getElementById('salario').value;
+        if (!salarioStr || salarioStr.trim() === "") {
+            mostrarFeedback("❌ Preencha o Salário Base primeiro!", "#ff6b6b");
+            return;
+        }
+        
+        let salarioNum = salarioStr.replace(/\./g, '').replace(',', '.');
+        salarioNum = parseFloat(salarioNum);
+        if (isNaN(salarioNum) || salarioNum === 0) {
+            mostrarFeedback("❌ Salário inválido! Digite um valor numérico.", "#ff6b6b");
+            return;
+        }
+        
+        const valorHoraNormal = salarioNum / 220;
+        
+        // 2. Validar data
+        const data = document.getElementById('dataRegistro').value;
+        if (!data) {
+            mostrarFeedback("❌ Selecione uma data!", "#ff6b6b");
+            return;
+        }
+        
+        // 3. Validar horários
+        const entrada = document.getElementById('t1').value;
+        const saidaAlmoco = document.getElementById('t2').value;
+        const retornoAlmoco = document.getElementById('t3').value;
+        const saidaFinal = document.getElementById('t4').value;
+        
+        if (!entrada || !saidaAlmoco || !retornoAlmoco || !saidaFinal) {
+            mostrarFeedback("❌ Preencha todos os horários!", "#ff6b6b");
+            return;
+        }
+        
+        // 4. Calcular horas trabalhadas
+        const entradaMin = horaParaMinutos(entrada);
+        const saidaAlmocoMin = horaParaMinutos(saidaAlmoco);
+        const retornoAlmocoMin = horaParaMinutos(retornoAlmoco);
+        const saidaFinalMin = horaParaMinutos(saidaFinal);
+        
+        // Validações de horário
+        if (entradaMin >= saidaAlmocoMin) {
+            mostrarFeedback("❌ Saída para almoço deve ser após a entrada!", "#ff6b6b");
+            return;
+        }
+        if (retornoAlmocoMin >= saidaFinalMin) {
+            mostrarFeedback("❌ Saída final deve ser após o retorno do almoço!", "#ff6b6b");
+            return;
+        }
+        if (saidaAlmocoMin >= retornoAlmocoMin) {
+            mostrarFeedback("❌ Retorno do almoço deve ser após a saída!", "#ff6b6b");
+            return;
+        }
+        
+        const minutosManha = saidaAlmocoMin - entradaMin;
+        const minutosTarde = saidaFinalMin - retornoAlmocoMin;
+        const minutosTotais = minutosManha + minutosTarde;
+        const horasTrabalhadas = minutosTotais / 60;
+        
+        if (horasTrabalhadas <= 0) {
+            mostrarFeedback("❌ Horários inválidos! Verifique os horários informados.", "#ff6b6b");
+            return;
+        }
+        
+        // 5. Calcular ganho do dia
+        const { ganho, tipoDia, percentual } = calcularGanhoDia(data, horasTrabalhadas, salarioNum, valorHoraNormal);
+        
+        // 6. Criar registro
+        const nome = document.getElementById('nomeFuncionario').value || "Não informado";
+        const justificativa = document.getElementById('justificativa').value;
+        
+        const novoRegistro = {
+            id: Date.now(),
+            data: data,
+            entrada: entrada,
+            saidaAlmoco: saidaAlmoco,
+            retornoAlmoco: retornoAlmoco,
+            saidaFinal: saidaFinal,
+            horas: horasTrabalhadas.toFixed(2),
+            ganho: ganho,
+            tipoDia: tipoDia,
+            percentual: percentual,
+            nome: nome,
+            obs: justificativa || "",
+            valorHoraNormal: valorHoraNormal,
+            criadoEm: new Date().toISOString()
+        };
+        
+        // 7. Adicionar ao array
+        registros.unshift(novoRegistro);
+        
+        // 8. Salvar e renderizar
+        salvarDados();
+        renderizarHistorico();
+        
+        // 9. Limpar justificativa
+        document.getElementById('justificativa').value = "";
+        
+        // 10. Feedback
+        mostrarFeedback(`✅ Registro adicionado! Valor: ${formatarMoeda(ganho)}`, "#00E5A0");
+        
+        console.log("Registro adicionado:", novoRegistro);
+    }
+    
+    // ==================== REMOVER REGISTRO ====================
+    
+    function removerRegistro(id) {
+        if (confirm("⚠️ Tem certeza que deseja remover este registro?")) {
+            registros = registros.filter(r => r.id !== id);
+            salvarDados();
+            renderizarHistorico();
+            mostrarFeedback("🗑️ Registro removido!", "#ffaa44");
+        }
+    }
+    
+    // ==================== RENDERIZAR HISTÓRICO ====================
+    
+    function renderizarHistorico() {
+        const container = document.getElementById('historico');
+        let totalGeral = 0;
+        
+        if (registros.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; opacity: 0.6;">
+                    📭 Nenhum registro ainda<br><br>
+                    ⬆️ Adicione seu primeiro ponto acima
+                </div>
+            `;
+        } else {
+            container.innerHTML = registros.map(reg => {
+                totalGeral += reg.ganho;
+                const dataFormatada = reg.data.split('-').reverse().join('/');
+                
+                // Determinar cor da tag
+                let tagColor = "#00E5A0";
+                if (reg.percentual === 100) tagColor = "#FF4B2B";
+                else if (reg.percentual === 50) tagColor = "#FFA500";
+                
+                return `
+                    <div class="item-ponto">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px;">
+                            <strong>📅 ${dataFormatada}</strong>
+                            <span class="tag-tipo" style="background: ${tagColor}; color: ${reg.percentual === 100 ? 'white' : '#042020'}">${reg.tipoDia}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+                            <span>⏱️ ${reg.horas}h trabalhadas</span>
+                            <span>🕐 ${reg.entrada} - ${reg.saidaFinal}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                            <span style="font-size: 0.7rem; opacity: 0.7;">👤 ${reg.nome}</span>
+                            <strong style="color: #00E5A0; font-size: 1rem;">${formatarMoeda(reg.ganho)}</strong>
+                        </div>
+                        ${reg.obs ? `<div style="font-size: 0.7rem; color: #FFD966; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; padding-top: 8px;">💬 ${reg.obs}</div>` : ''}
+                        <button class="btn-remover" onclick="removerRegistro(${reg.id})">✖️ Remover</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        document.getElementById('totalGeral').innerText = formatarMoeda(totalGeral);
+        document.getElementById('contadorDias').innerText = `${registros.length} ${registros.length === 1 ? 'dia registrado' : 'dias registrados'}`;
+    }
+    
+    // ==================== GERAR PDF ====================
+    
+    function gerarPDF() {
+        if (registros.length === 0) {
+            mostrarFeedback("📄 Nada para imprimir. Adicione alguns registros primeiro!", "#ffaa44");
+            return;
+        }
+        
+        mostrarFeedback("📄 Preparando PDF...", "#00E5A0");
+        setTimeout(() => {
+            window.print();
+        }, 200);
+    }
+    
+    // ==================== LIMPAR HISTÓRICO ====================
+    
+    function limparHistorico() {
+        if (confirm("🔴 ATENÇÃO! Isso apagará TODOS os registros permanentemente. Continuar?")) {
+            registros = [];
+            salvarDados();
+            renderizarHistorico();
+            mostrarFeedback("🗑️ Todo o histórico foi limpo!", "#ff6b6b");
+        }
+    }
+    
+    // ==================== INICIALIZAÇÃO ====================
+    
+    // Relógio em tempo real
     setInterval(() => {
         const agora = new Date();
         document.getElementById('liveClock').innerText = agora.toLocaleTimeString('pt-BR');
-        document.getElementById('currentDateDisplay').innerText = agora.toLocaleDateString('pt-BR', { dateStyle: 'full' });
+        document.getElementById('currentDateDisplay').innerHTML = agora.toLocaleDateString('pt-BR', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
     }, 1000);
-
+    
+    // Data padrão
     document.getElementById('dataRegistro').value = new Date().toISOString().split('T')[0];
-
-    const feriados2026 = { "2026-05-01": "Trabalho", "2026-05-10": "Mães", "2026-12-25": "Natal" };
-    let registros = JSON.parse(localStorage.getItem('ponto_registros')) || [];
-
-    function atualizarValores() {
-        const sal = parseFloat(document.getElementById('salario').value.replace(/\./g, '').replace(',', '.')) || 0;
-        const hBase = sal / 220;
-        const f = (v) => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-        document.getElementById('vHoraBase').innerText = f(hBase);
-        document.getElementById('vHora50').innerText = f(hBase * 1.5);
-        document.getElementById('vHora100').innerText = f(hBase * 2);
-    }
-
-    function adicionarPonto() {
-        const salStr = document.getElementById('salario').value;
-        const data = document.getElementById('dataRegistro').value;
-        if (!salStr || !data) return alert("Preencha Salário e Data!");
-
-        const sal = parseFloat(salStr.replace(/\./g, '').replace(',', '.'));
-        const vBase = sal / 220;
-        const hParaM = (h) => h.split(':').reduce((p, c) => p * 60 + +c);
-        const min = (hParaM(document.getElementById('t4').value) - hParaM(document.getElementById('t3').value)) +
-                    (hParaM(document.getElementById('t2').value) - hParaM(document.getElementById('t1').value));
-        const hTotais = min / 60;
-        const diaS = new Date(data + "T00:00:00").getDay();
-        const feriado = feriados2026[data];
-
-        let vFinal = (feriado || diaS === 0) ? vBase * 2 : (diaS === 6 || hTotais > 8) ? vBase * 1.5 : vBase;
-        let ganho = ( (feriado || diaS === 0 || diaS === 6) ? hTotais * vFinal : (Math.min(hTotais, 8) * vBase) + (Math.max(0, hTotais - 8) * vBase * 1.5) ) + ((sal * 0.3) / 22);
-
-        registros.unshift({ data, h: hTotais.toFixed(2), ganho, obs: document.getElementById('justificativa').value, label: feriado || (diaS === 0 ? "Dom" : diaS === 6 ? "Sáb" : "Normal") });
-        localStorage.setItem('ponto_registros', JSON.stringify(registros));
-        renderizar();
-    }
-
-    function renderizar() {
-        const div = document.getElementById('historico');
-        let total = 0;
-        div.innerHTML = registros.map(r => {
-            total += r.ganho;
-            return `<div class="item-ponto">
-                <div style="display:flex; justify-content:space-between"><b>📅 ${r.data.split('-').reverse().join('/')}</b> <span>${r.label}</span></div>
-                <div style="display:flex; justify-content:space-between; margin-top:5px"><span>${r.h}h trabalhadas</span> <b style="color:#00E5A0">${r.ganho.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</b></div>
-                ${r.obs ? `<div style="font-size:0.7rem; color:orange; border-top:1px solid #333; margin-top:5px">💬 ${r.obs}</div>` : ''}
-            </div>`;
-        }).join('');
-        document.getElementById('totalGeralAcumulado').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-        document.getElementById('qtdDias').innerText = `${registros.length} dia(s) no total`;
-    }
-
-    function baixarRelatorio() {
-        if (registros.length === 0) return alert("Sem dados!");
-        const nome = document.getElementById('nomeFuncionario').value || "Funcionario";
-        let txt = `RELATORIO PONTO - ${nome}\nTOTAL: ${document.getElementById('totalGeralAcumulado').innerText}\n\n`;
-        registros.forEach(r => txt += `${r.data} | ${r.h}h | ${r.ganho.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}\n`);
-        
-        // Técnica compatível com Mobile
-        const blob = new Blob([txt], { type: "text/plain" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `Relatorio_Ponto_${nome}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
-
-    function limparHistorico() { if(confirm("Limpar tudo?")) { registros = []; localStorage.clear(); renderizar(); } }
-
-    window.onload = renderizar;
+    
+    // Evento de input para o salário
+    document.getElementById('salario').addEventListener('input', calcularValoresHora);
+    document.getElementById('salario').addEventListener('change', () => salvarDados());
+    document.getElementById('nomeFuncionario').addEventListener('change', () => salvarDados());
+    
+    // Carregar dados e iniciar
+    carregarDados();
+    renderizarHistorico();
+    calcularValoresHora();
+    
+    console.log("✅ Sistema Ponto PRO inicializado!");
+    
+    // Expor funções globalmente
+    window.adicionarPonto = adicionarPonto;
+    window.removerRegistro = removerRegistro;
+    window.gerarPDF = gerarPDF;
+    window.limparHistorico = limparHistorico;
+    window.calcularValoresHora = calcularValoresHora;
 </script>
 </body>
 </html>
